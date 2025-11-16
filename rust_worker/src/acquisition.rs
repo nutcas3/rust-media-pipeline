@@ -2,7 +2,6 @@ use anyhow::{Context, Result};
 use sha2::Digest;
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::process::Command;
 use tracing::info;
 
 use crate::{config::Config, JobPayload};
@@ -228,7 +227,7 @@ pub async fn create_file_manifest(job: &JobPayload, _config: &Config) -> Result<
 }
 
 pub async fn verify_file_integrity(job: &JobPayload, _config: &Config) -> Result<String> {
-    info!("Verifying file integrity");
+    info!("Verifying file integrity using native ffmpeg");
     
     let file_type = job.params.get("file_type")
         .and_then(|v| v.as_str())
@@ -236,29 +235,80 @@ pub async fn verify_file_integrity(job: &JobPayload, _config: &Config) -> Result
     
     let result = match file_type {
         "video" | "audio" | "auto" => {
-            // Use ffmpeg to verify
-            let output = Command::new("ffmpeg")
-                .args(&[
-                    "-v", "error",
-                    "-i", &job.input_path,
-                    "-f", "null",
-                    "-",
-                ])
-                .output()
-                .context("Failed to execute ffmpeg")?;
-            
-            let is_valid = output.status.success();
-            let errors = String::from_utf8_lossy(&output.stderr).to_string();
-            
-            serde_json::json!({
-                "valid": is_valid,
-                "file_type": file_type,
-                "errors": if errors.is_empty() { None } else { Some(errors) },
-                "message": if is_valid { "File is valid" } else { "File has errors" }
-            })
+            match ffmpeg::format::input(&job.input_path) {
+                Ok(mut ictx) => {
+                    let mut frame_count = 0;
+                    let mut has_video = false;
+                    let mut has_audio = false;
+                    let mut errors = Vec::new();
+                    
+                    for stream in ictx.streams() {
+                        match stream.parameters().medium() {
+                            ffmpeg::media::Type::Video => has_video = true,
+                            ffmpeg::media::Type::Audio => has_audio = true,
+                            _ => {}
+                        }
+                    }
+                    
+                    if has_video {
+                        if let Some(video_stream) = ictx.streams().best(ffmpeg::media::Type::Video) {
+                            let video_stream_index = video_stream.index();
+                            
+                            match ffmpeg::codec::context::Context::from_parameters(video_stream.parameters()) {
+                                Ok(context_decoder) => {
+                                    match context_decoder.decoder().video() {
+                                        Ok(mut decoder) => {
+                                            for (stream, packet) in ictx.packets() {
+                                                if stream.index() == video_stream_index {
+                                                    if decoder.send_packet(&packet).is_ok() {
+                                                        let mut decoded = ffmpeg::util::frame::video::Video::empty();
+                                                        while decoder.receive_frame(&mut decoded).is_ok() {
+                                                            frame_count += 1;
+                                                            if frame_count >= 10 {
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    if frame_count >= 10 {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Err(e) => errors.push(format!("Video decoder error: {}", e)),
+                                    }
+                                }
+                                Err(e) => errors.push(format!("Context error: {}", e)),
+                            }
+                        }
+                    }
+                    
+                    let is_valid = errors.is_empty() && (has_video || has_audio);
+                    
+                    serde_json::json!({
+                        "valid": is_valid,
+                        "file_type": if has_video && has_audio { "video+audio" } 
+                                     else if has_video { "video" } 
+                                     else if has_audio { "audio" } 
+                                     else { "unknown" },
+                        "has_video": has_video,
+                        "has_audio": has_audio,
+                        "frames_tested": frame_count,
+                        "errors": if errors.is_empty() { None } else { Some(errors) },
+                        "message": if is_valid { "File is valid" } else { "File has errors" }
+                    })
+                }
+                Err(e) => {
+                    serde_json::json!({
+                        "valid": false,
+                        "file_type": "invalid",
+                        "errors": Some(vec![format!("Cannot open file: {}", e)]),
+                        "message": "File cannot be opened or is corrupted"
+                    })
+                }
+            }
         }
         _ => {
-            // Basic file read test
             let mut file = File::open(&job.input_path)?;
             let mut buffer = [0u8; 1024];
             let bytes_read = file.read(&mut buffer)?;

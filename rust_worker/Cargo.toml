@@ -1,0 +1,35 @@
+[package]
+name = "rust_worker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.35", features = ["full"] }
+anyhow = "1.0"
+thiserror = "2.0.17"
+toml = "0.9.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+sha2 = "0.10"
+hex = "0.4"
+chrono = "0.4"
+ffmpeg-next = "8.0"
+image = "0.25.9"
+
+# Optional: For S3 support
+aws-config = { version = "1.1", optional = true }
+aws-sdk-s3 = { version = "1.13", optional = true }
+
+# Optional: For advanced audio/video processing
+ffmpeg = ["ffmpeg-next"]
+
+[features]
+default = []
+s3 = ["aws-config", "aws-sdk-s3"]
+ffmpeg = ["ffmpeg-next"]
+
+[[bin]]
+name = "rust_worker"
+path = "src/main.rs"

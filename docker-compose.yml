@@ -1,0 +1,49 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: media_pipeline_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: media_pipeline_web
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    environment:
+      - FLASK_ENV=development
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: python app.py
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: media_pipeline_worker
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: python worker.py
+    deploy:
+      replicas: 2  # Run 2 worker instances
+
+volumes:
+  redis_data:

@@ -1,0 +1,6 @@
+flask==3.0.0
+redis==7.0.1
+rq==2.6.0
+python-dotenv==1.0.0
+toml==0.10.2
+werkzeug==3.0.1

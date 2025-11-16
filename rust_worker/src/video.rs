@@ -4,7 +4,6 @@ use tracing::{info, warn};
 
 use crate::{config::Config, JobPayload};
 
-/// Transcode video from H.264 to H.265 (HEVC) for better compression
 pub async fn transcode_h264_to_h265(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Transcoding H.264 to H.265");
     
@@ -31,7 +30,6 @@ pub async fn transcode_h264_to_h265(job: &JobPayload, _config: &Config) -> Resul
     Ok(job.output_path.clone())
 }
 
-/// Resize video to 720p (1280x720) while maintaining aspect ratio
 pub async fn resize_to_720p(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Resizing video to 720p");
     
@@ -53,7 +51,6 @@ pub async fn resize_to_720p(job: &JobPayload, _config: &Config) -> Result<String
     Ok(job.output_path.clone())
 }
 
-/// Extract N thumbnails at regular intervals
 pub async fn extract_thumbnails(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Extracting thumbnails");
     
@@ -81,7 +78,6 @@ pub async fn extract_thumbnails(job: &JobPayload, _config: &Config) -> Result<St
     Ok(job.output_path.clone())
 }
 
-/// Create an animated GIF from the first N seconds of video
 pub async fn create_animated_gif(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Creating animated GIF");
     
@@ -111,7 +107,6 @@ pub async fn create_animated_gif(job: &JobPayload, _config: &Config) -> Result<S
     Ok(job.output_path.clone())
 }
 
-/// Detect scene cuts and output timestamps
 pub async fn detect_scene_cuts(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Detecting scene cuts");
     
@@ -136,7 +131,6 @@ pub async fn detect_scene_cuts(job: &JobPayload, _config: &Config) -> Result<Str
     Ok(job.output_path.clone())
 }
 
-/// Apply a watermark overlay to video
 pub async fn apply_watermark(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Applying watermark");
     
@@ -166,7 +160,6 @@ pub async fn apply_watermark(job: &JobPayload, _config: &Config) -> Result<Strin
     Ok(job.output_path.clone())
 }
 
-/// Extract a single key frame at specified timestamp
 pub async fn extract_key_frame(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Extracting key frame");
     
@@ -193,7 +186,6 @@ pub async fn extract_key_frame(job: &JobPayload, _config: &Config) -> Result<Str
     Ok(job.output_path.clone())
 }
 
-/// Burn subtitles into video
 pub async fn burn_in_subtitles(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Burning in subtitles");
     
@@ -255,7 +247,6 @@ pub async fn rotate_video(job: &JobPayload, _config: &Config) -> Result<String> 
     Ok(job.output_path.clone())
 }
 
-/// Stabilize shaky video footage
 pub async fn stabilize_video(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Stabilizing video");
     
@@ -307,7 +298,6 @@ pub async fn stabilize_video(job: &JobPayload, _config: &Config) -> Result<Strin
     Ok(job.output_path.clone())
 }
 
-/// Deinterlace video (convert interlaced to progressive)
 pub async fn deinterlace_video(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Deinterlacing video");
     
@@ -397,7 +387,6 @@ pub async fn change_video_speed(job: &JobPayload, _config: &Config) -> Result<St
     Ok(job.output_path.clone())
 }
 
-/// Concatenate multiple video files
 pub async fn concatenate_videos(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Concatenating videos");
     
@@ -440,7 +429,6 @@ pub async fn concatenate_videos(job: &JobPayload, _config: &Config) -> Result<St
     Ok(job.output_path.clone())
 }
 
-/// Convert video to different container format
 pub async fn convert_video_format(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Converting video format");
     

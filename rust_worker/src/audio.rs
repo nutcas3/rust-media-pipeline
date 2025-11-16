@@ -128,7 +128,6 @@ pub async fn generate_waveform_json(job: &JobPayload, _config: &Config) -> Resul
     Ok(job.output_path.clone())
 }
 
-/// Extract mono track from audio
 pub async fn extract_mono_track(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Extracting mono track");
     
@@ -174,7 +173,6 @@ pub async fn reduce_audio_noise(job: &JobPayload, _config: &Config) -> Result<St
     Ok(job.output_path.clone())
 }
 
-/// Split audio into separate channels
 pub async fn split_audio_channels(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Splitting audio channels");
     
@@ -213,7 +211,6 @@ pub async fn split_audio_channels(job: &JobPayload, _config: &Config) -> Result<
     Ok(job.output_path.clone())
 }
 
-/// Detect audio format and properties
 pub async fn detect_audio_format(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Detecting audio format");
     
@@ -237,7 +234,6 @@ pub async fn detect_audio_format(job: &JobPayload, _config: &Config) -> Result<S
     Ok(job.output_path.clone())
 }
 
-/// Detect audio peaks and create report
 pub async fn detect_audio_peaks(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Detecting audio peaks");
     
@@ -326,7 +322,6 @@ pub async fn mix_audio_tracks(job: &JobPayload, _config: &Config) -> Result<Stri
     Ok(job.output_path.clone())
 }
 
-/// Apply audio fade in/out effects
 pub async fn apply_audio_fade(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Applying audio fade");
     
@@ -372,7 +367,6 @@ pub async fn apply_audio_fade(job: &JobPayload, _config: &Config) -> Result<Stri
     Ok(job.output_path.clone())
 }
 
-/// Extract audio from video file
 pub async fn extract_audio_from_video(job: &JobPayload, _config: &Config) -> Result<String> {
     info!("Extracting audio from video");
     

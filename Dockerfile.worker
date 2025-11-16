@@ -1,0 +1,33 @@
+FROM rust:1.88 as builder
+
+WORKDIR /build
+
+
+COPY rust_worker/ .
+
+RUN cargo build --release
+
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    exiftool \
+    gzip \
+    zstd \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY python_frontend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY python_frontend/worker.py ./python_frontend/
+COPY config/ ./config/
+
+COPY --from=builder /build/target/release/rust_worker ./rust_worker/target/release/rust_worker
+
+RUN mkdir -p data/input data/output
+
+WORKDIR /app/python_frontend
+
+CMD ["python", "worker.py"]

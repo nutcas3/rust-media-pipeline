@@ -1,0 +1,22 @@
+[redis]
+url = "redis://localhost:6379"
+queue_name = "media_processing"
+
+[storage]
+type = "local"  # Options: "local" or "s3"
+input_path = "./data/input"
+output_path = "./data/output"
+
+[storage.s3]
+bucket = "my-media-bucket"
+region = "us-east-1"
+# Set AWS credentials via environment variables:
+# AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
+
+[processing]
+max_workers = 4
+timeout_seconds = 3600
+
+[logging]
+level = "info"  # Options: "debug", "info", "warn", "error"
+format = "json"

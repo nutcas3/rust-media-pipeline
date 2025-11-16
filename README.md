@@ -295,7 +295,7 @@ Response:
 }
 ```
 
-## ⚡ Native FFmpeg Processing
+## Native FFmpeg Processing
 
 This pipeline uses **ffmpeg-next v7.0** Rust bindings for 100% native audio/video processing:
 
@@ -325,7 +325,7 @@ All video and audio jobs use native `ffmpeg-next` bindings:
 - **No CLI calls**: Zero subprocess spawning for media operations
 - **Hardware ready**: Supports NVENC, QuickSync, VideoToolbox acceleration
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run Rust tests
@@ -341,7 +341,7 @@ cargo build --release
 ./scripts/test_jobs.sh
 ```
 
-## 📊 Monitoring
+## Monitoring
 
 ### View RQ Dashboard (Optional)
 
@@ -363,7 +363,7 @@ redis-cli
 > LLEN rq:queue:media_processing
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Rust binary not found
 ```bash
@@ -401,7 +401,7 @@ python worker.py
 redis-cli LLEN rq:queue:media_processing
 ```
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 rust_media_pipeline/
